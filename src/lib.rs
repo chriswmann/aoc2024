@@ -1,17 +1,29 @@
 pub mod cli;
 pub mod day01;
 
+pub mod run {
+    use crate::cli::Part;
+    use crate::day01;
+    pub fn run(data: &str, day: u8, part: Option<Part>) {
+        let day_fn = match day {
+            1 => day01::day01,
+            _ => unimplemented!(),
+        };
+        day_fn(data, part);
+    }
+}
+
 pub mod helpers {
     use std::fs;
     use std::path;
 
-    pub fn load_data(day: u8, part: u8) -> String {
-        let local_path = get_local_path(day, part);
+    pub fn load_data(day: u8) -> String {
+        let local_path = get_local_path(day);
         if let Some(data) = try_loading_cached_data(&local_path) {
             return data;
         }
-        let data = get_remote_data(day, part);
-        let local_path = get_local_path(day, part);
+        let data = get_remote_data(day);
+        let local_path = get_local_path(day);
         fs::write(local_path, &data).expect("Write data to local cache");
         data
     }
@@ -24,7 +36,7 @@ pub mod helpers {
         None
     }
 
-    fn get_remote_data(day: u8, part: u8) -> String {
+    fn get_remote_data(day: u8) -> String {
         println!("Reading from adventofcode.com");
         let url = format!("https://adventofcode.com/2024/day/{}/input", day);
         let session_id = std::env::var("AOC_2024_SESSION_ID").expect("AOC_2024_SESSION_ID not set");
@@ -44,7 +56,7 @@ pub mod helpers {
         response.text().expect("couldn't get text from response")
     }
 
-    fn get_local_path(day: u8, part: u8) -> String {
-        format!("data/day{:02}_part{:02}.txt", day, part)
+    fn get_local_path(day: u8) -> String {
+        format!("data/day{:02}.txt", day)
     }
 }
