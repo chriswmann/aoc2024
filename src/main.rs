@@ -10,6 +10,6 @@ fn main() {
             let data = load_data(d);
             run(&data, d, args.part);
         }
-        _ => unreachable!(),
+        _ => eprintln!("Invalid day: {}. Must be in range 1..=25.", args.day),
     }
 }

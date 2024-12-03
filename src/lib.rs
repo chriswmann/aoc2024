@@ -1,12 +1,15 @@
 pub mod cli;
 pub mod day01;
+pub mod day02;
 
 pub mod run {
     use crate::cli::Part;
     use crate::day01;
+    use crate::day02;
     pub fn run(data: &str, day: u8, part: Option<Part>) {
         let day_fn = match day {
-            1 => day01::day01,
+            1 => day01::run,
+            2 => day02::run,
             _ => unimplemented!(),
         };
         day_fn(data, part);

@@ -12,23 +12,12 @@ pub fn run(data: &str, part: Option<Part>) {
 }
 
 pub fn part01(data: &str) {
-    let (mut first, mut second) = parse_input(data);
-    first.sort_unstable();
-    second.sort_unstable();
-    let answer: u32 = first
-        .iter()
-        .zip(second.iter())
-        .map(|(a, b)| (*a as i32 - *b as i32).unsigned_abs())
-        .sum();
+    let answer = "Unimplemented";
     println!("Day 1, Part 1 answer is: {}", answer);
 }
 
 pub fn part02(data: &str) {
-    let (first, second) = parse_input(data);
-    let answer: u32 = first
-        .iter()
-        .map(|f| second.iter().filter(|s| f == *s).count() as u32 * f)
-        .sum();
+    let answer = "Unimplemented";
     println!("Day 1, Part 2 answer is: {}", answer);
 }
 
