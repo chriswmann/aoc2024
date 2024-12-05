@@ -23,7 +23,7 @@ pub fn part01(data: &str) -> u32 {
         .for_each(|line| rows.push(line_to_digits(line)));
     let mut answer = 0u32;
     for row in rows {
-        if report_decreasing_slowly(&row).is_none() || report_increasing_slowly(&row).is_none() {
+        if report_decreasing_slowly(&row) || report_increasing_slowly(&row) {
             answer += 1;
         }
     }
@@ -36,34 +36,28 @@ fn line_to_digits(line: &str) -> Vec<u32> {
         .collect()
 }
 
-// If the levels aren't decreasing slowly, return the index of the
-// level that is wrong (so that it can be removed for the problem dampener).
-// Otherwise return None (the report is good).
-fn report_decreasing_slowly(report: &[u32]) -> Option<usize> {
+fn report_decreasing_slowly(report: &[u32]) -> bool {
     let len = report.len();
     for level_idx in 0..len - 1 {
         let left = report[level_idx];
         let right = report[level_idx + 1];
         if !(1..4).contains(&(left.saturating_sub(right))) {
-            return Some(level_idx);
+            return false;
         }
     }
-    None
+    true
 }
 
-// If the levels aren't increasing slowly, return the index of the
-// level that is wrong (so that it can be removed for the problem dampener).
-// Otherwise return None (the report is good).
-fn report_increasing_slowly(report: &[u32]) -> Option<usize> {
+fn report_increasing_slowly(report: &[u32]) -> bool {
     let len = report.len();
     for level_idx in 0..len - 1 {
         let left = report[level_idx];
         let right = report[level_idx + 1];
         if !(1..4).contains(&(right.saturating_sub(left))) {
-            return Some(level_idx);
+            return false;
         }
     }
-    None
+    true
 }
 
 // Terribly inefficient brute force solution but it works.
@@ -75,18 +69,14 @@ pub fn part02(data: &str) -> u32 {
         .for_each(|line| reports.push(line_to_digits(line)));
     let mut answer = 0u32;
     for report in reports {
-        if report_decreasing_slowly(&report).is_none()
-            || report_increasing_slowly(&report).is_none()
-        {
+        if report_decreasing_slowly(&report) || report_increasing_slowly(&report) {
             answer += 1;
             continue;
         }
         for level_idx in 0..report.len() {
             let mut new_report = report.clone();
             new_report.remove(level_idx);
-            if report_decreasing_slowly(&new_report).is_none()
-                || report_increasing_slowly(&new_report).is_none()
-            {
+            if report_decreasing_slowly(&new_report) || report_increasing_slowly(&new_report) {
                 answer += 1;
                 break;
             }
