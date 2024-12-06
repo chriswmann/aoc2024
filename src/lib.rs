@@ -2,17 +2,20 @@ pub mod cli;
 pub mod day01;
 pub mod day02;
 pub mod day03;
+pub mod day04;
 
 pub mod run {
     use crate::cli::Part;
     use crate::day01;
     use crate::day02;
     use crate::day03;
+    use crate::day04;
     pub fn run(data: &str, day: u8, part: Option<Part>) {
         let day_fn = match day {
             1 => day01::run,
             2 => day02::run,
             3 => day03::run,
+            4 => day04::run,
             _ => unimplemented!(),
         };
         day_fn(data, part);
