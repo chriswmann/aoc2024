@@ -36,7 +36,7 @@ struct Grid<'x> {
     matches: u32,
 }
 
-impl<'x> Grid<'x> {
+impl Grid<'_> {
     fn new(points: Vec<Vec<Point>>) -> Self {
         Self {
             points,
@@ -52,7 +52,7 @@ impl<'x> Grid<'x> {
         if let Some(row) = self.points.get(y as usize) {
             return row.get(x as usize);
         }
-        return None;
+        None
     }
 
     fn search_eastwards(&mut self, point: &Point) {
@@ -252,7 +252,7 @@ impl fmt::Display for Grid<'_> {
             for c in row {
                 write!(f, "{}", c)?;
             }
-            write!(f, "\n")?;
+            writeln!(f)?;
         }
         Ok(())
     }
