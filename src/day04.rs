@@ -1,5 +1,5 @@
-use std::fmt;
 use crate::cli::Part;
+use std::fmt;
 pub fn run(data: &str, part: Option<Part>) {
     if let Some(part) = part {
         let answer = match part {
@@ -37,18 +37,22 @@ struct Grid<'x> {
 }
 
 impl<'x> Grid<'x> {
-    fn new (points: Vec<Vec<Point>>) -> Self {
-        Self{ points, xmas: "XMAS", matches: 0 }
+    fn new(points: Vec<Vec<Point>>) -> Self {
+        Self {
+            points,
+            xmas: "XMAS",
+            matches: 0,
+        }
     }
 
     fn get_point_by_coords(&self, x: i32, y: i32) -> Option<&Point> {
         if x < 0 || y < 0 {
-            return None
+            return None;
         }
         if let Some(row) = self.points.get(y as usize) {
-             return row.get(x as usize);
+            return row.get(x as usize);
         }
-       return None
+        return None;
     }
 
     fn search_eastwards(&mut self, point: &Point) {
@@ -78,7 +82,7 @@ impl<'x> Grid<'x> {
                 return;
             }
         }
-        self.matches += 1; 
+        self.matches += 1;
     }
 
     fn search_southwards(&mut self, point: &Point) {
@@ -155,7 +159,6 @@ impl<'x> Grid<'x> {
         }
         self.matches += 1;
     }
-    
 
     fn search_northeastwards(&mut self, point: &Point) {
         let x = point.x;
@@ -171,7 +174,7 @@ impl<'x> Grid<'x> {
         }
         self.matches += 1;
     }
-    
+
     fn radial_search_from_point(&mut self, point: &Point) {
         self.search_eastwards(point);
         self.search_southeastwards(point);
@@ -183,12 +186,60 @@ impl<'x> Grid<'x> {
         self.search_northeastwards(point);
     }
 
-    fn grid_search(&mut self) {
+    fn x_shape_search_from_point(&mut self, point: &Point) {
+        if let (Some(ne), Some(se), Some(sw), Some(nw)) = (
+            self.get_point_by_coords(point.x + 1, point.y - 1),
+            self.get_point_by_coords(point.x + 1, point.y + 1),
+            self.get_point_by_coords(point.x - 1, point.y + 1),
+            self.get_point_by_coords(point.x - 1, point.y - 1),
+        ) {
+            match (nw.v, se.v, sw.v, ne.v) {
+                // M . S
+                // . A .
+                // M . S
+                (nw, se, sw, ne) if nw == 'M' && se == 'S' && sw == 'M' && ne == 'S' => {
+                    self.matches += 1;
+                }
+                // M . M
+                // . A .
+                // S . S
+                (nw, se, sw, ne) if nw == 'M' && se == 'S' && sw == 'S' && ne == 'M' => {
+                    self.matches += 1;
+                }
+                // S . S
+                // . A .
+                // M . M
+                (nw, se, sw, ne) if nw == 'S' && se == 'M' && sw == 'M' && ne == 'S' => {
+                    self.matches += 1;
+                }
+                // S . M
+                // . A .
+                // S . M
+                (nw, se, sw, ne) if nw == 'S' && se == 'M' && sw == 'S' && ne == 'M' => {
+                    self.matches += 1;
+                }
+                (_, _, _, _) => (),
+            }
+        }
+    }
+
+    fn grid_search_part01(&mut self) {
         let start = self.xmas.chars().next().unwrap();
         for row in self.points.clone().iter() {
             for point in row.iter() {
-                if point.v ==  start {
-                    self.radial_search_from_point(point); 
+                if point.v == start {
+                    self.radial_search_from_point(point);
+                }
+            }
+        }
+    }
+
+    fn grid_search_part02(&mut self) {
+        let start = 'A';
+        for row in self.points.clone().iter() {
+            for point in row.iter() {
+                if point.v == start {
+                    self.x_shape_search_from_point(point);
                 }
             }
         }
@@ -207,13 +258,16 @@ impl fmt::Display for Grid<'_> {
     }
 }
 
-
 fn parse_input(data: &str) -> Grid {
     let mut points = Vec::with_capacity(data.len());
     for (y, line) in data.lines().enumerate() {
         let mut row = Vec::with_capacity(line.len());
         for (x, c) in line.chars().enumerate() {
-            row.push(Point {x: x as i32, y: y as i32, v: c});
+            row.push(Point {
+                x: x as i32,
+                y: y as i32,
+                v: c,
+            });
         }
         points.push(row);
     }
@@ -222,12 +276,14 @@ fn parse_input(data: &str) -> Grid {
 
 pub fn part01(data: &str) -> u32 {
     let mut grid = parse_input(data);
-    grid.grid_search();
+    grid.grid_search_part01();
     grid.matches
 }
 
 pub fn part02(data: &str) -> u32 {
-    42
+    let mut grid = parse_input(data);
+    grid.grid_search_part02();
+    grid.matches
 }
 
 #[cfg(test)]
@@ -236,7 +292,7 @@ mod tests {
 
     #[test]
     fn test_part01() {
-        let data  = "..X...\n.SAMX.\n.A..A.\nXMAS.S\n.X....";
+        let data = "..X...\n.SAMX.\n.A..A.\nXMAS.S\n.X....";
         let answer = part01(data);
         assert_eq!(answer, 4);
     }
@@ -245,6 +301,6 @@ mod tests {
     fn test_part02() {
         let data = ".M.S......\n..A..MSMS.\n.M.S.MAA..\n..A.ASMSM.\n.M.S.M....\n..........\nS.S.S.S.S.\n.A.A.A.A..\nM.M.M.M.M.\n..........";
         let answer = part02(data);
-        assert_eq!(answer, 0);
+        assert_eq!(answer, 9);
     }
 }
