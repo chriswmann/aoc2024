@@ -1,4 +1,6 @@
 use crate::cli::Part;
+use std::fmt;
+use std::str::FromStr;
 use once_cell::sync::Lazy;
 use regex::Regex;
 pub fn run(data: &str, part: Option<Part>) {
@@ -17,6 +19,18 @@ pub fn run(data: &str, part: Option<Part>) {
     println!("Day 2, Part 2 answer is: {:?}", part02_answer);
 }
 
+#[derive(Debug, PartialEq, Eq)]
+enum Day03Error {
+}
+
+impl fmt::Display for Day03Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Operation error.")
+    }
+}
+impl std::error::Error for Day03Error {}
+
+#[derive(Debug, PartialEq, Eq)]
 struct Operation {
     multiplier: u32,
     multiplicand: u32,
@@ -24,8 +38,9 @@ struct Operation {
 
 /// Given a string with format 'mul(\d+,\d+)', parse the two digits and return an Instruction struct.
 /// The left digit is the multiplier and the right digit is the multiplicand.
-impl std::convert::From<&str> for Operation {
-    fn from(s: &str) -> Self {
+impl std::str::FromStr for Operation {
+    type Err = Day03Error;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parts = s.split(',');
         let multiplier = parts
             .next()
@@ -43,10 +58,10 @@ impl std::convert::From<&str> for Operation {
             .collect::<String>()
             .parse()
             .unwrap();
-        Self {
+        Ok(Self {
             multiplier,
             multiplicand,
-        }
+        })
     }
 }
 
@@ -73,7 +88,7 @@ pub fn part01(data: &str) -> u32 {
     let regex_iter = regex_find_iter(data);
     let mut instructions = Vec::new();
     for m in regex_iter {
-        instructions.push(Operation::from(m.as_str()).mul());
+        instructions.push(Operation::from_str(m.as_str()).expect("The regex match ensures we get a str we can convert to Operation").mul());
     }
     instructions.iter().sum::<u32>()
 }
@@ -86,7 +101,7 @@ pub fn part02(data: &str) -> u32 {
         if enabled {
             let regex_iter = regex_find_iter(split);
             for m in regex_iter {
-                instructions.push(Operation::from(m.as_str()).mul());
+                instructions.push(Operation::from_str(m.as_str()).expect("The regex match ensures we get a str we can convert to Operation").mul());
             }
         }
         if split.ends_with("do()") {
