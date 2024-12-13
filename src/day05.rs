@@ -136,7 +136,7 @@ pub fn part01(data: &str) -> u32 {
     42
 }
 
-pub fn part02(data: &str) -> u32 {
+pub fn part02(_data: &str) -> u32 {
     42
 }
 
