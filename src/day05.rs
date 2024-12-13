@@ -1,4 +1,5 @@
 use crate::cli::Part;
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fmt;
 use std::str::FromStr;
 pub fn run(data: &str, part: Option<Part>) {
@@ -46,6 +47,12 @@ struct Rule {
     after: u32,
 }
 
+impl fmt::Display for Rule {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "{}->{}", self.before, self.after)
+    }
+}
+
 impl std::str::FromStr for Rule {
     type Err = Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -64,7 +71,19 @@ impl std::str::FromStr for Rule {
     }
 }
 
-fn parse_rules(rules: &str) -> Vec<Rule> {
+#[derive(Clone, Debug, PartialEq)]
+struct Order {
+    number: u32,
+    must_follow: Vec<u32>,
+}
+
+impl fmt::Display for Order {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "{}: {:#?}", self.number, self.must_follow)
+    }
+}
+
+fn parse_rules_input(rules: &str) -> Vec<Rule> {
     rules
         .trim()
         .lines()
@@ -84,11 +103,36 @@ fn parse_updates(updates: &str) -> Vec<Vec<u32>> {
         .collect()
 }
 
+fn parse_rules(rules: &[Rule]) -> VecDeque<Order> {
+    let mut unsorted_order = HashMap::new();
+    for rule in rules {
+        let item = unsorted_order
+            .entry(rule.before)
+            .or_insert_with(|| HashSet::new());
+        item.insert(rule.after);
+    }
+    let sorted_order = VecDeque::new();
+    'outer: for (before1, _) in unsorted_order.into_iter() {
+        for (before2, after) in unsorted_order.into_iter() {
+            if before2 != before1 {
+                if after.contains(&before1) {
+                    sorted_order.push_back(before1);
+                    break 'outer;
+                }
+            }
+        }
+        sorted_order.push_front(before1);
+    }
+    sorted_order
+}
+
 pub fn part01(data: &str) -> u32 {
     let (rules, updates) = parse_input_parts(data);
-    let rules = parse_rules(rules);
+    let rules = parse_rules_input(rules);
+    let order = parse_rules(&rules);
     let updates = parse_updates(updates);
     println!("Rules len: {}, updates len: {}", rules.len(), updates.len());
+    println!("Rules order: {:#?}", &order);
     42
 }
 
