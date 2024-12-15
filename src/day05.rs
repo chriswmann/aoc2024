@@ -28,20 +28,6 @@ fn parse_input_parts(data: &str) -> (&str, &str) {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-enum Error {
-    FromStrError(String),
-}
-
-impl std::error::Error for Error {}
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::FromStrError(e) => writeln!(f, "Couldn't get rule from str, {}", e),
-        }
-    }
-}
-
-#[derive(Clone, Debug, PartialEq)]
 struct Rule {
     before: u32,
     after: u32,
