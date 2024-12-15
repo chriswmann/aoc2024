@@ -1,3 +1,5 @@
+//! Not the most streamlined or efficient route but it makes adding
+//! plots of the travelled route or similar easier.
 use crate::cli::Part;
 use crate::error::AocError;
 use std::{
