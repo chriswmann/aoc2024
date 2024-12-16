@@ -27,52 +27,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aoc2024_day01"
-version = "0.1.0"
-dependencies = [
- "santas_little_helpers",
-]
-
-[[package]]
-name = "aoc2024_day02"
-version = "0.1.0"
-dependencies = [
- "santas_little_helpers",
-]
-
-[[package]]
-name = "aoc2024_day03"
-version = "0.1.0"
-dependencies = [
- "once_cell",
- "regex",
- "santas_little_helpers",
-]
-
-[[package]]
-name = "aoc2024_day04"
-version = "0.1.0"
-dependencies = [
- "santas_little_helpers",
-]
-
-[[package]]
-name = "aoc2024_day05"
-version = "0.1.0"
-dependencies = [
- "santas_little_helpers",
-]
-
-[[package]]
-name = "aoc2024_day06"
-version = "0.1.0"
-dependencies = [
- "santas_little_helpers",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -182,6 +136,52 @@ name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
+
+[[package]]
+name = "day01"
+version = "0.1.0"
+dependencies = [
+ "santas_little_helpers",
+]
+
+[[package]]
+name = "day02"
+version = "0.1.0"
+dependencies = [
+ "santas_little_helpers",
+]
+
+[[package]]
+name = "day03"
+version = "0.1.0"
+dependencies = [
+ "once_cell",
+ "regex",
+ "santas_little_helpers",
+]
+
+[[package]]
+name = "day04"
+version = "0.1.0"
+dependencies = [
+ "santas_little_helpers",
+]
+
+[[package]]
+name = "day05"
+version = "0.1.0"
+dependencies = [
+ "santas_little_helpers",
+]
+
+[[package]]
+name = "day06"
+version = "0.1.0"
+dependencies = [
+ "santas_little_helpers",
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "deranged"
