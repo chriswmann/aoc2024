@@ -1,2 +1,0 @@
-[toolchain]
-channel = "nightly" # needed due to pattern feature in regex
