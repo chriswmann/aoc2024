@@ -1,0 +1,9 @@
+[package]
+name = "aoc2024_day06"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+santas_little_helpers = { path = "../santas_little_helpers" }
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"

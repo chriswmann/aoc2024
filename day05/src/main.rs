@@ -1,21 +1,20 @@
-use crate::cli::Part;
+use santas_little_helpers::data::{get_day_number, load_data};
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::fmt;
 use std::str::FromStr;
-pub fn run(data: &str, part: Option<Part>) {
-    if let Some(part) = part {
-        let answer = match part {
-            Part::One => part01(data),
-            Part::Two => part02(data),
-        };
-        println!("Day 2, Part {} answer is: {:?}", part, answer);
-        return;
-    }
-    let part01_answer = part01(data);
 
-    println!("Day 2, Part 1 answer is: {:?}", part01_answer);
+fn main() {
+    let package_name = env!("CARGO_PKG_NAME");
+    let day_number = get_day_number(package_name);
+    let data = load_data(day_number);
+    run(&data);
+}
+
+fn run(data: &str) {
+    let part01_answer = part01(data);
+    println!("Day 1, Part 1 answer is: {}", part01_answer);
     let part02_answer = part02(data);
-    println!("Day 2, Part 2 answer is: {:?}", part02_answer);
+    println!("Day 1, Part 2 answer is: {}", part02_answer);
 }
 
 // The data is in two parts this time: updates rules, blank line, updates data.

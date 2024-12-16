@@ -1,34 +1,23 @@
-use crate::cli::Part;
-use std::fmt;
-use std::str::FromStr;
 use once_cell::sync::Lazy;
 use regex::Regex;
-pub fn run(data: &str, part: Option<Part>) {
-    if let Some(part) = part {
-        let answer = match part {
-            Part::One => part01(data),
-            Part::Two => part02(data),
-        };
-        println!("Day 2, Part {} answer is: {:?}", part, answer);
-        return;
-    }
+use santas_little_helpers::data::{get_day_number, load_data};
+use santas_little_helpers::error::AocError;
+
+use std::str::FromStr;
+
+fn main() {
+    let package_name = env!("CARGO_PKG_NAME");
+    let day_number = get_day_number(package_name);
+    let data = load_data(day_number);
+    run(&data);
+}
+
+fn run(data: &str) {
     let part01_answer = part01(data);
-
-    println!("Day 2, Part 1 answer is: {:?}", part01_answer);
+    println!("Day 1, Part 1 answer is: {}", part01_answer);
     let part02_answer = part02(data);
-    println!("Day 2, Part 2 answer is: {:?}", part02_answer);
+    println!("Day 1, Part 2 answer is: {}", part02_answer);
 }
-
-#[derive(Debug, PartialEq, Eq)]
-enum Day03Error {
-}
-
-impl fmt::Display for Day03Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Operation error.")
-    }
-}
-impl std::error::Error for Day03Error {}
 
 #[derive(Debug, PartialEq, Eq)]
 struct Operation {
@@ -39,7 +28,7 @@ struct Operation {
 /// Given a string with format 'mul(\d+,\d+)', parse the two digits and return an Instruction struct.
 /// The left digit is the multiplier and the right digit is the multiplicand.
 impl std::str::FromStr for Operation {
-    type Err = Day03Error;
+    type Err = AocError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parts = s.split(',');
         let multiplier = parts
@@ -88,7 +77,11 @@ pub fn part01(data: &str) -> u32 {
     let regex_iter = regex_find_iter(data);
     let mut instructions = Vec::new();
     for m in regex_iter {
-        instructions.push(Operation::from_str(m.as_str()).expect("The regex match ensures we get a str we can convert to Operation").mul());
+        instructions.push(
+            Operation::from_str(m.as_str())
+                .expect("The regex match ensures we get a str we can convert to Operation")
+                .mul(),
+        );
     }
     instructions.iter().sum::<u32>()
 }
@@ -101,7 +94,11 @@ pub fn part02(data: &str) -> u32 {
         if enabled {
             let regex_iter = regex_find_iter(split);
             for m in regex_iter {
-                instructions.push(Operation::from_str(m.as_str()).expect("The regex match ensures we get a str we can convert to Operation").mul());
+                instructions.push(
+                    Operation::from_str(m.as_str())
+                        .expect("The regex match ensures we get a str we can convert to Operation")
+                        .mul(),
+                );
             }
         }
         if split.ends_with("do()") {

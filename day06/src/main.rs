@@ -1,26 +1,23 @@
 //! Not the most streamlined or efficient route but it makes adding
 //! plots of the travelled route or similar easier.
-use crate::cli::Part;
-use crate::error::AocError;
-use std::{
-    collections::HashSet,
-    ops::{Add, Sub},
-};
+use santas_little_helpers::data::{get_day_number, load_data};
+use santas_little_helpers::error::AocError;
 
-pub fn run(data: &str, part: Option<Part>) {
-    if let Some(part) = part {
-        let answer = match part {
-            Part::One => part01(data),
-            Part::Two => part02(data),
-        };
-        println!("Day 2, Part {} answer is: {:?}", part, answer);
-        return;
-    }
+use std::ops::{Add, Sub};
+use std::collections::HashSet;
+
+fn main() {
+    let package_name = env!("CARGO_PKG_NAME");
+    let day_number = get_day_number(package_name);
+    let data = load_data(day_number);
+    run(&data);
+}
+
+fn run(data: &str) {
     let part01_answer = part01(data);
-
-    println!("Day 2, Part 1 answer is: {:?}", part01_answer);
+    println!("Day 1, Part 1 answer is: {}", part01_answer);
     let part02_answer = part02(data);
-    println!("Day 2, Part 2 answer is: {:?}", part02_answer);
+    println!("Day 1, Part 2 answer is: {}", part02_answer);
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd)]
