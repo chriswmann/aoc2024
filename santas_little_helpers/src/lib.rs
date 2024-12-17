@@ -96,14 +96,11 @@ pub mod data {
     }
 
     fn get_local_path(day: u8) -> String {
-        format!("data/day{:02}.txt", day)
+        format!("cached_data/day{:02}.txt", day)
     }
 
     pub fn get_day_number(package_name: &str) -> u8 {
-        let (_, day) = package_name
-            .split_once('_')
-            .expect("Package name should have event and day");
-        let (_, day_number) = day.split_once("day").expect("'day' and number");
+        let (_, day_number) = package_name.split_once("day").expect("'day' and number");
         day_number
             .parse::<u8>()
             .expect("Day should have a number with it")

@@ -1,12 +1,7 @@
 [workspace]
-members = [
-  "santas_little_helpers",
-  "day01",
-  "day02",
-  "day03",
-  "day04",
-  "day05",
-  "day06",
-  "santas_little_helpers",
-]
+members = ["santas_little_helpers", "day*"]
+default-members = ["day*"]
 resolver = "2"
+
+[workspace.dependencies]
+santas_little_helpers = { path = "santas_little_helpers" }

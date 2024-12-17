@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-santas_little_helpers = { path = "../santas_little_helpers" }
+santas_little_helpers = { workspace = true }
