@@ -1,6 +1,6 @@
 # Advent of Code 2024
 
-![Build Status](https://github.com/chriswmann/aoc2024/actions/workflows/rust.yml/badge.svg?branch=main)
+![Build Status](https://github.com/chriswmann/aoc2024/actions/workflows/rust.yml/badge.svg?branch=main) [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 AoC 2024 in rust.
 
