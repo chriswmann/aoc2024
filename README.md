@@ -1,5 +1,7 @@
 # Advent of Code 2024
 
+![Build Status](https://github.com/chriswmann/aoc2024/actions/workflows/rust.yml/badge.svg?branch=main)
+
 AoC 2024 in rust.
 
 To run a specific day, use `cargo r --bin <DAY>`, where `DAY` is like `day01`.
