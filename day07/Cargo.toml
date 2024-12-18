@@ -10,3 +10,4 @@ nom-derive = "0.10.1"
 rstest = { workspace = true }
 rstest_reuse = { workspace = true }
 santas_little_helpers = { workspace = true }
+itertools = "0.13"

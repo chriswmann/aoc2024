@@ -1,4 +1,4 @@
-use anyhow;
+use itertools::Itertools;
 use nom::{
     bytes::complete::tag,
     character::complete::{self, line_ending, space1},
@@ -43,14 +43,17 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Row>> {
     separated_list1(line_ending, parse_row)(input)
 }
 
+fn brute_force(input: &str) -> u32 {
+    let (_, rows) = parse_input(input).expect("Input is consistently parsable");
+    todo!();
+}
+
 pub fn part01(data: &str) -> u32 {
-    let (_, rows) = parse_input(data).expect("Input is consistently parsable");
-    println!("{:?}", rows);
-    42
+    todo!();
 }
 
 pub fn part02(_data: &str) -> u32 {
-    42
+    todo!();
 }
 
 #[cfg(test)]
