@@ -1,5 +1,8 @@
-use santas_little_helpers::data::{get_day_number, load_data};
-use std::collections::{HashMap, HashSet, VecDeque};
+use santas_little_helpers::{
+    data::{get_day_number, load_data},
+    error::AocError,
+};
+use std::collections::HashMap;
 use std::fmt;
 use std::str::FromStr;
 
@@ -17,15 +20,6 @@ fn run(data: &str) {
     println!("Day 1, Part 2 answer is: {}", part02_answer);
 }
 
-// The data is in two parts this time: updates rules, blank line, updates data.
-fn parse_input_parts(data: &str) -> (&str, &str) {
-    let mut iter = data.split("\n\n");
-    let rules = iter.next().unwrap();
-    let updates = iter.next().unwrap();
-    assert_eq!(iter.next(), None);
-    (rules, updates)
-}
-
 #[derive(Clone, Debug, PartialEq)]
 struct Rule {
     before: u32,
@@ -39,7 +33,7 @@ impl fmt::Display for Rule {
 }
 
 impl std::str::FromStr for Rule {
-    type Err = Error;
+    type Err = AocError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut iter = s.split('|');
         let before = iter
@@ -56,69 +50,87 @@ impl std::str::FromStr for Rule {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
-struct Order {
-    number: u32,
-    must_follow: Vec<u32>,
+#[derive(Debug)]
+struct PageOrderingRules {
+    rules: Vec<Rule>,
 }
 
-impl fmt::Display for Order {
+impl fmt::Display for PageOrderingRules {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "{}: {:#?}", self.number, self.must_follow)
+        let head = self.rules.iter().take(6).collect::<Vec<_>>();
+        writeln!(f, "{:#?}", head)
     }
 }
 
-fn parse_rules_input(rules: &str) -> Vec<Rule> {
-    rules
+type Update = Vec<u32>;
+
+#[derive(Debug)]
+struct Data {
+    rules: PageOrderingRules,
+    updates: Vec<Update>,
+}
+
+fn parse_rules_input(input: &str) -> PageOrderingRules {
+    let rules = input
         .trim()
         .lines()
         .map(|l| Rule::from_str(l).unwrap())
-        .collect()
+        .collect();
+    PageOrderingRules { rules }
 }
 
-fn parse_updates(updates: &str) -> Vec<Vec<u32>> {
-    updates
+fn parse_updates_input(input: &str) -> Vec<Update> {
+    input
         .lines()
-        .map(|line| {
-            line.chars()
-                .filter(|c| *c != ',')
-                .map(|c| c.to_digit(10).unwrap())
-                .collect::<Vec<_>>()
-        })
+        .map(|l| l.split(',').map(|n| n.parse::<u32>().unwrap()).collect())
         .collect()
 }
 
-fn parse_rules(rules: &[Rule]) -> VecDeque<Order> {
-    let mut unsorted_order = HashMap::new();
-    for rule in rules {
-        let item = unsorted_order
-            .entry(rule.before)
-            .or_insert_with(|| HashSet::new());
-        item.insert(rule.after);
+// The data is in two parts this time: updates rules, blank line, updates data.
+fn parse_input(input: &str) -> Data {
+    let mut parts = input.split("\n\n");
+    let rules_input = parts.next().expect("There should always be some rules");
+    let rules = parse_rules_input(rules_input);
+    let updates_input = parts.next().expect("There should always be some updates");
+    let updates = parse_updates_input(updates_input);
+    Data { rules, updates }
+}
+
+fn create_page_update_map(update: &Update) -> HashMap<&u32, usize> {
+    let mut page_to_index_map = HashMap::new();
+
+    for (idx, page) in update.iter().enumerate() {
+        page_to_index_map.insert(page, idx);
     }
-    let sorted_order = VecDeque::new();
-    'outer: for (before1, _) in unsorted_order.into_iter() {
-        for (before2, after) in unsorted_order.into_iter() {
-            if before2 != before1 {
-                if after.contains(&before1) {
-                    sorted_order.push_back(before1);
-                    break 'outer;
-                }
-            }
+
+    page_to_index_map
+}
+
+fn update_is_valid(rules: &PageOrderingRules, page_to_index_map: &HashMap<&u32, usize>) -> bool {
+    for rule in &rules.rules {
+        if !page_to_index_map.contains_key(&rule.before)
+            || !page_to_index_map.contains_key(&rule.after)
+        {
+            continue;
         }
-        sorted_order.push_front(before1);
+        let before_idx = page_to_index_map.get(&rule.before).unwrap();
+        let after_idx = page_to_index_map.get(&rule.after).unwrap();
+
+        if before_idx > after_idx {
+            return false;
+        }
     }
-    sorted_order
+
+    true
 }
 
 pub fn part01(data: &str) -> u32 {
-    let (rules, updates) = parse_input_parts(data);
-    let rules = parse_rules_input(rules);
-    let order = parse_rules(&rules);
-    let updates = parse_updates(updates);
-    println!("Rules len: {}, updates len: {}", rules.len(), updates.len());
-    println!("Rules order: {:#?}", &order);
-    42
+    let data = parse_input(data);
+    data.updates
+        .iter()
+        .filter(|update| update_is_valid(&data.rules, &create_page_update_map(update)))
+        .map(|update| update[update.len() / 2])
+        .sum()
 }
 
 pub fn part02(_data: &str) -> u32 {
@@ -133,8 +145,11 @@ mod tests {
     fn test_part01() {
         let data = "47|53\n97|13\n97|61\n97|47\n75|29\n61|13\n75|53\n29|13\n97|29\n53|29\n61|53\n97|53\n61|29\n47|13\n75|47\n97|75\n47|61\n75|61\n47|29\n75|13\n53|13\n\n75,47,61,53,29\n97,61,53,29,13\n75,29,13\n75,97,47,61,53\n61,13,29\n97,13,75,29,47";
         let answer = part01(data);
+        assert_eq!(answer, 143);
     }
 
     #[test]
-    fn test_part02() {}
+    fn test_part02() {
+        todo!();
+    }
 }
