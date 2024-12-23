@@ -96,17 +96,17 @@ fn parse_input(input: &str) -> Data {
     Data { rules, updates }
 }
 
-fn create_page_update_map(update: &Update) -> HashMap<&u32, usize> {
+fn create_page_update_map(update: &Update) -> HashMap<u32, usize> {
     let mut page_to_index_map = HashMap::new();
 
     for (idx, page) in update.iter().enumerate() {
-        page_to_index_map.insert(page, idx);
+        page_to_index_map.insert(*page, idx);
     }
 
     page_to_index_map
 }
 
-fn update_is_valid(rules: &PageOrderingRules, page_to_index_map: &HashMap<&u32, usize>) -> bool {
+fn update_is_valid(rules: &PageOrderingRules, page_to_index_map: &HashMap<u32, usize>) -> bool {
     for rule in &rules.rules {
         if !page_to_index_map.contains_key(&rule.before)
             || !page_to_index_map.contains_key(&rule.after)
@@ -124,32 +124,74 @@ fn update_is_valid(rules: &PageOrderingRules, page_to_index_map: &HashMap<&u32, 
     true
 }
 
+fn correct_update_order(
+    update: &Update,
+    rules: &PageOrderingRules,
+    page_to_index_map: &HashMap<u32, usize>,
+) -> Update {
+    let mut new_page_to_index_map = page_to_index_map.clone();
+    let mut new_update = update.clone();
+
+    for rule in &rules.rules {
+        if !new_page_to_index_map.contains_key(&rule.before)
+            || !new_page_to_index_map.contains_key(&rule.after)
+        {
+            continue;
+        }
+
+        let before_idx = *new_page_to_index_map.get(&rule.before).unwrap();
+        let after_idx = *new_page_to_index_map.get(&rule.after).unwrap();
+
+        if before_idx > after_idx {
+            new_update.swap(before_idx, after_idx);
+            new_page_to_index_map.insert(rule.before, after_idx);
+            new_page_to_index_map.insert(rule.after, before_idx);
+        }
+    }
+    if !update_is_valid(rules, &new_page_to_index_map) {
+        return correct_update_order(&new_update, rules, &new_page_to_index_map);
+    }
+
+    new_update
+}
+
 pub fn part01(data: &str) -> u32 {
     let data = parse_input(data);
-    data.updates
+    let answer: u32 = data
+        .updates
         .iter()
         .filter(|update| update_is_valid(&data.rules, &create_page_update_map(update)))
         .map(|update| update[update.len() / 2])
-        .sum()
+        .sum();
+    answer
 }
 
-pub fn part02(_data: &str) -> u32 {
-    42
+pub fn part02(data: &str) -> u32 {
+    let data = parse_input(data);
+    let answer: u32 = data
+        .updates
+        .iter()
+        .filter(|update| !update_is_valid(&data.rules, &create_page_update_map(update)))
+        .map(|update| correct_update_order(update, &data.rules, &create_page_update_map(update)))
+        .map(|update| update[update.len() / 2])
+        .sum();
+    answer //4716
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    const DATA: &str = "47|53\n97|13\n97|61\n97|47\n75|29\n61|13\n75|53\n29|13\n97|29\n53|29\n61|53\n97|53\n61|29\n47|13\n75|47\n97|75\n47|61\n75|61\n47|29\n75|13\n53|13\n\n75,47,61,53,29\n97,61,53,29,13\n75,29,13\n75,97,47,61,53\n61,13,29\n97,13,75,29,47";
     #[test]
     fn test_part01() {
-        let data = "47|53\n97|13\n97|61\n97|47\n75|29\n61|13\n75|53\n29|13\n97|29\n53|29\n61|53\n97|53\n61|29\n47|13\n75|47\n97|75\n47|61\n75|61\n47|29\n75|13\n53|13\n\n75,47,61,53,29\n97,61,53,29,13\n75,29,13\n75,97,47,61,53\n61,13,29\n97,13,75,29,47";
-        let answer = part01(data);
+        let answer = part01(DATA);
         assert_eq!(answer, 143);
     }
 
     #[test]
     fn test_part02() {
-        todo!();
+        let answer = part02(DATA);
+        assert_eq!(answer, 123);
     }
 }

@@ -10,9 +10,7 @@ nightly rust. Day 3 can therefore by run using `cargo +nightly r --bin day03`.
 
 Or run `just run-day <DAY>`, e.g. `just run-day 03` (zero padding is required).
 
-Day 5 doesn't work at the moment, so to run unit tests across the workspace,
-use `cargo t --workspace --exclude day05`.
-
+To run unit tests across the workspace use `cargo t --workspace --exclude day05`.
 Or run `just run-tests`.
 
 To add a new day, run `just add-day <DAY>`, again with `DAY` a zero-padded
