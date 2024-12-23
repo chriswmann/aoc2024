@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    name: CI AoC 2024 in Rust (skip day05)
+    name: CI AoC 2024 in Rust
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,10 +25,10 @@ jobs:
       # `cargo check` command here will use installed `nightly`
       # as it is set as an "override" for current directory
       - name: Run cargo check
-        run: cargo +nightly check --workspace --exclude day05
+        run: cargo +nightly check --workspace
       - name: Lint
-        run: cargo +nightly clippy --workspace --exclude day05 --all-targets --verbose --all-features
+        run: cargo +nightly clippy --workspace --all-targets --verbose --all-features
       - name: Build
-        run: cargo +nightly build --workspace --exclude day05 --verbose
+        run: cargo +nightly build --workspace --verbose
       - name: Run tests
-        run: cargo +nightly test --verbose --workspace --exclude day05
+        run: cargo +nightly test --verbose --workspace
